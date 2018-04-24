@@ -1,0 +1,197 @@
+################################################################################
+
+Prepare an R tool for the CGC 
+
+1. Find the right docker image from rocker
+2. Create and run the dockerfile
+3. Follow the steps below to create the tool and export it to the CGC
+4. Test tool with Rabix prior to exporting to CGC
+#################################################################################
+
+Find the right Docker image
+
+Visit: https://hub.docker.com/r/rocker/r-ver/
+
+
+#################################################################################
+
+Create and run the Dockerfile
+
+Here is Dockerfile I used to generate the workflow I need
+
+fl <- system.file("docker/rnaseqGene", "Dockerfile",
+                  package = "sevenbridges")
+
+Here is the current content of the Dockerfile:
+
+cat(readLines(fl), sep = '\n')
+-------------------------------------------------------------------------------------------
+
+# Create bash command in the potra_corN_bashCommand.sh  file
+
+touch potra_corN_bashCommand.sh 
+vi potra_corN_bashCommand.sh 
+## Write the following in the bash file
+
+#!/usr/bin/Rscript
+Rscript PoTRA_corN.R mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
+
+# Create the Dockerfile
+
+FROM rocker/verse:3.3.1
+
+"usage: potra_corN.R [options]
+
+options:
+--mydata.txt
+--genelist.txt
+--Num_sample_normal
+--Num_sample_case
+--PR_quantile
+--output File Name
+" -> doc
+
+
+MAINTAINER "Margaret Linan" mlinan@asu.edu
+
+
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite()'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("BiocGenerics")'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("graph")'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("graphite")'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("igraph")'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("org.HS.eg.db")'
+
+## add json file only for testing purposes see sections below
+ADD src/potra_corN.R /usr/local/bin/
+ADD src/potra_corN_baseCommand.sh /usr/local/bin/
+
+CMD ["bash", "/usr/local/bin/potra_corN_bashCommand.sh"]
+
+--------------------------------------------------------------------------------------------
+
+Then, build and run the Docker image:
+
+$ docker build -t my-bash-app .
+...
+$ docker run -it --rm --name my-running-app my-bash-app
+...
+
+
+
+
+
+#################################################################################
+
+Follow the steps below to create the tool and export it to the CGC
+
+## Preview your R tool script
+fl <- system.file("docker/potra_corN/src", "PoTRA_corN.R", package = "sevenbridges")
+cat(readLines(fl), sep = '\n')
+
+library("sevenbridges")
+
+rbx <- Tool(id = "PoTRA_Correlation_Analysis",
+            label = "potra_corN",
+            description = "PoTRA is a PageRank-based method that can be used to detect pathways involved in disease",
+            hints = requirements(docker(pull = "potra/potra_corN"), cpu(1), mem(2000)),
+            baseCommand = "Rscript PoTRA_corN.R",
+			stdout = "Results_CorN.txt",
+            inputs = list(
+                input(
+                    id = "mydata", label = "mydata",
+                    description = "gene expression data",
+                    type = "File", 
+					position = 1,
+                    required = TRUE),
+                input(
+                    id = "genelist", label = "genelist",
+                    description = "gene list",
+					type = "File",
+                    position = 2, 
+					required = TRUE),       
+                input(
+                    id = "NumSampleNorm", label =  "Num.sample.normal",
+                    description = "number of normal samples",
+					type = "integer",
+                    position = 3,
+                    required = TRUE),
+				input(
+                    id = "NumSampleCases", label =  "Num.sample.cases",
+                    description = "number of case samples",
+					type = "integer",
+                    position = 4,
+                    required = TRUE),
+				input(
+                    id = "PR_quantile", label =  "PR_quantile",
+                    description = "number of case samples",
+					type = "integer",
+                    position = 5,
+                    required = TRUE)),
+            outputs = output(id = "results.cor", glob = "Results_CorN.txt"))
+                        
+
+fl <- "inst/docker/potra_corN/rabix/potra_corN.json"
+write(rbx$toJSON(pretty = TRUE), fl)
+
+# You can load the json script to the CGC api and run it without input 
+#################################################################################
+
+Test tool with Rabix prior to exporting to CGC.
+Place example test data in the following dir: 
+"inst/docker/potra_corN/rabix/"
+
+docker pull potra/porta_corN
+
+## docker run --privileged --name bunny -v </path/to/data_dir>:/bunny_data -dit potra/porta_corN
+
+docker run --privileged --name bunny -v <inst/docker/potra_corN/rabix/>:/bunny_data -dit potra/porta_corN
+
+## Execute tool
+
+## Make inputs.json file to declare input parameters in the same directory (you can use relative paths from inputs.json to data). Create container:
+## docker exec bunny bash -c 'cd /opt/bunny && ./rabix.sh -e /bunny_data /bunny_data/<tool>.json /bunny_data/inputs.json'
+
+touch inputs.json
+vi inputs.json
+inst/docker/potra_corN/rabix/mydata.txt
+inst/docker/potra_corN/rabix/genefile.txt
+
+
+docker exec bunny bash -c 'cd /opt/bunny && ./rabix.sh -e /bunny_data /bunny_data/potra_corN.json /bunny_data/inputs.json'
+
+
+library("sevenbridges")
+
+in.df <- data.frame(id = c("number", "min", "max", "seed"),
+                    description = c("number of observation",
+                                    "lower limits of the distribution",
+                                    "upper limits of the distribution",
+                                    "seed with set.seed"),
+                    type = c("integer", "float", "float", "float"),
+                    label = c("number" ,"min", "max", "seed"),
+                    prefix = c("--n", "--min", "--max", "--seed"),
+                    default = c(1, 0, 10, 123),
+                    required = c(TRUE, FALSE, FALSE, FALSE))
+out.df <- data.frame(id = c("random", "report"),
+                     type = c("file", "file"),
+                     glob = c("*.txt", "*.html"))
+rbx <- Tool(id = "runif",
+            label = "Random number generator",
+            # hints = requirements(docker(pull = "tengfei/runif"),
+            #                      cpu(1), mem(2000)),
+            baseCommand = "runif.R",
+            inputs = in.df,  # or ins.df
+            outputs = out.df)
+params <- list(number = 3, max = 5)
+
+set_test_env("tengfei/testenv", "mount_dir")
+test_tool(rbx, params)
+
+#################################################################################
+
+
+Now you want to add app to your project p, by calling app_add method, the first argument is name, the second is either a CWL JSON file, Tool object, or Workflow object.
+
+# add App you just created
+(rna.app <- p$app_add("rnaseqgene", rbx))
