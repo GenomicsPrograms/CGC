@@ -32,7 +32,7 @@ if (length(args)==0) {
 
 ## set up environment variables in Windows Command Shell:
 ## export Num_sample_normal=4
-## export Num_sample_case=4
+## export Num_sample_case=4 
 ## export PR_quantile=0.95
 
 ## Rscript PoTRA_corN.R mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
