@@ -20,7 +20,7 @@ if (length(args)==0) {
 ## SET Num_sample_case=4
 ## SET PR_quantile=0.95
 
-## Rscript PoTRA_corN_Devel_V3.r mydata.gene genelist.txt %Num_sample_normal% %Num_sample_case% %PR_quantile% Results_CorN.txt
+## Rscript PoTRA_corN.R mydata.gene genelist.txt %Num_sample_normal% %Num_sample_case% %PR_quantile% Results_CorN.txt
 
 ## - or - 
 
