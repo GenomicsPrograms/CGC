@@ -1,6 +1,6 @@
 FROM bioconductor/devel_base2
 
-#usage: potra_corN.R [arguments]
+#usage: Rscript potra_corN.R [arguments]
 
 #arguements:
 # --mydata.txt
