@@ -37,7 +37,7 @@ if (length(args)==0) {
 
 ## Rscript PoTRA_corN_Devel_V3.r mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
 
-Rscript PoTRA_corN.R mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
+##Rscript PoTRA_corN.R mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
 
 ## args[1] = mydata
 ## args[2] = genelist
