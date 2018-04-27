@@ -20,7 +20,7 @@ if (length(args)==0) {
 ## SET Num_sample_case=4
 ## SET PR_quantile=0.95
 
-## Rscript PoTRA_corN.R mydata.gene genelist.txt %Num_sample_normal% %Num_sample_case% %PR_quantile% Results_CorN.txt
+## Rscript PoTRA_corN_Devel_V3.r mydata.gene genelist.txt %Num_sample_normal% %Num_sample_case% %PR_quantile% Results_CorN.txt
 
 ## - or - 
 
@@ -32,10 +32,12 @@ if (length(args)==0) {
 
 ## set up environment variables in Windows Command Shell:
 ## export Num_sample_normal=4
-## export Num_sample_case=4 
+## export Num_sample_case=4
 ## export PR_quantile=0.95
 
-## Rscript PoTRA_corN.R mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
+## Rscript PoTRA_corN_Devel_V3.r mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
+
+Rscript PoTRA_corN.R mydata.gene genelist.txt $Num_sample_normal $Num_sample_case $PR_quantile Results_CorN.txt
 
 ## args[1] = mydata
 ## args[2] = genelist
@@ -176,12 +178,15 @@ PoTRA.corN <- function(mydata,genelist,Num.sample.normal,Num.sample.case,Pathway
 
 
 # Reformat mydata.txt
-mydata.gene <- read.table(args[1], header = TRUE, sep = "\t")
+
+f1 <- args[1]
+f2 <- args[2]
+mydata.gene <- read.table(f1, header = TRUE, sep = "\t")
 mydata <- mydata.gene[,-1]
 rownames(mydata) <- mydata.gene[,1]
 
 # create dataframe from input file
-genelist <- read.table(args[2], header = TRUE, sep = "\t")
+genelist <- read.table(f2, header = TRUE, sep = "\t")
 
 humanKEGG <- pathways("hsapiens", "kegg")
 
@@ -194,7 +199,7 @@ humanKEGG <- pathways("hsapiens", "kegg")
 
 
 
-## Rscript PoTRA_corN.R mydata.gene genelist.txt %Num_sample_normal% %Num_sample_case% %PR_quantile% Results_CorN.txt
+## Rscript PoTRA_corN_Devel_V2.r mydata.gene genelist.txt %Num_sample_normal% %Num_sample_case% %PR_quantile% Results_CorN.txt
 
 
 ##For PoTRA.corN:
