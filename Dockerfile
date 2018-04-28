@@ -23,7 +23,8 @@ RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("igraph")
 RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("org.Hs.eg.db")'
 
 ## add json file only for testing purposes see sections below
-ADD src/potra_corN.R /usr/local/bin/
-ADD src/potra_corN_baseCommand.sh /usr/local/bin/
-
-CMD ["bash", "/usr/local/bin/potra_corN_bashCommand.sh"]
+RUN mkdir -p /usr/bin/potra
+COPY PoTRA_Example_Data.RData /usr/bin/potra/
+COPY potra_corN_baseCommand.sh /usr/bin/potra/
+WORKDIR /usr/bin/potra/
+CMD ["bash", "/usr/bin/potra/potra_corN_bashCommand.sh"]
