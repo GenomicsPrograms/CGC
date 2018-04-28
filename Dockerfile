@@ -10,10 +10,7 @@ FROM bioconductor/devel_base2
 # --PR_quantile
 # --output File Name
 
-
-
 #MAINTAINER "Margaret Linan" mlinan@asu.edu
-
 
 RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite()'
 RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("BiocGenerics")'
