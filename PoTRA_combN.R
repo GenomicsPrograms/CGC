@@ -229,4 +229,4 @@ humanKEGG <- pathways("hsapiens", "kegg")
 results.comb <-PoTRA.combN(mydata=mydata,genelist=genelist,Num.sample.normal=args[3],Num.sample.case=args[4],Pathway.database=humanKEGG,PR.quantile=args[5])
 
 dput(results.comb, args[7])
-
+ 
