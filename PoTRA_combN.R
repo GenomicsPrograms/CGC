@@ -196,15 +196,13 @@ PoTRA.combN <- function(mydata, genelist, Num.sample.normal, Num.sample.case, Pa
 
 
 # Reformat mydata.txt
-f1 <- args[1]
-f2 <- args[2]
 
-mydata.gene <- read.table(f1, header = TRUE, sep = "\t")
+mydata.gene <- read.table(args[1], header = TRUE, sep = "\t")
 mydata <- mydata.gene[,-1]
 rownames(mydata) <- mydata.gene[,1]
 
 # create dataframe from input file
-genelist <- read.table(f2, header = TRUE, sep = "\t")
+genelist <- read.table(args[2], header = TRUE, sep = "\t")
 
 humanKEGG <- pathways("hsapiens", "kegg")
 
@@ -230,5 +228,5 @@ humanKEGG <- pathways("hsapiens", "kegg")
 
 results.comb <-PoTRA.combN(mydata=mydata,genelist=genelist,Num.sample.normal=args[3],Num.sample.case=args[4],Pathway.database=humanKEGG,PR.quantile=args[5])
 
-dput(results.comb, "Results_CombN.txt")
+dput(results.comb, args[7])
 
