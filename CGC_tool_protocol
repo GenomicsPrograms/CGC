@@ -60,7 +60,7 @@ RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("BiocGene
 RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("graph")'
 RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("graphite")'
 RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("igraph")'
-RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("org.HS.eg.db")'
+RUN Rscript -e 'source("http://bioconductor.org/biocLite.R"); biocLite("org.Hs.eg.db")'
 
 ## add json file only for testing purposes see sections below
 ADD src/potra_corN.R /usr/local/bin/
